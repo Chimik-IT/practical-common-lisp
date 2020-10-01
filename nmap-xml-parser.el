@@ -10,6 +10,9 @@
 (defun get-address (number)
   (cdaadr (assoc 'address (elt (map-xml-to-lisp "~/telekom2.xml") number))))
 
+(defun get-status (number)
+  (cdaadr (assoc 'status (elt (map-xml-to-lisp "~/telekom2.xml") number))))
+
 (defun get-hostname (number)
   (cdaadr (assoc 'hostname (assoc 'hostnames (elt (map-xml-to-lisp "~/telekom2.xml") number)))))
 
@@ -23,22 +26,16 @@
     (setq num (1+ num))
     (push (cdr (assoc 'portid (cadr(elt (assoc 'ports (elt (map-xml-to-lisp "~/telekom2.xml") number))num)))) services-list)
     (push (cdaadr (assoc 'service (cdddr (elt (assoc 'ports (elt (map-xml-to-lisp "~/telekom2.xml") number)) num)))) serv-name-list))
-  services-list)
+  (setq service-port-list (combine2lists serv-name-list services-list "/")))
 
 (defun make-host-list (ip-list)
   (while ip-list
-    (setq num (car ip-list)
-	  address (get-address num)
-	  services-list (make-service-list num))
-    (push (list address services-list serv-name-list) hosts-list)
-    (setq ip-list (cdr ip-list)))
+    (setq zahl (pop ip-list))
+    (push (list (get-address zahl) (get-hostname zahl) (get-status zahl) (make-service-list zahl)) hosts-list))
   hosts-list)
 
-
-;;; Testing Area
-
-(setq hosts-list ())
-(make-host-list '(25 63 78))
-hosts-list
-serv-name-list
-
+(defun combine2lists (list1 list2 combinator)
+  (setq serv ())
+  (while list1
+    (push (format "%s%s%s" (pop list1) combinator (pop list2)) serv))
+    (mapconcat 'identity serv " "))
