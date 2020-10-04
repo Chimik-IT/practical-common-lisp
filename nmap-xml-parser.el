@@ -7,7 +7,7 @@
   (setq	csvfile (read))
   (prin1 "Paths stored!"))
 (defvar csvfile "~/org/scripts/my-table-parser/taeble.csv")
-(defvar xmlfile "~/telekom2.xml")
+(defvar xmlfile "~/home.xml")
 (defun map-xml-to-lisp ()
   (let* ((nmap-xml-object (with-temp-buffer
 			    (insert-file-contents xmlfile)
@@ -20,7 +20,7 @@
     (insert-file-contents "~/org/scripts/my-table-parser/table.csv")
     (split-string (buffer-string) "\n")))
 
-(defun content2-list-of-lines ()
+((defun content2-list-of-lines ()
   (setq list-of-lines ()
 	list-of-strings (get-csv-content))
   (while list-of-strings
@@ -37,7 +37,7 @@
   (dolist (i (content2-list-of-lines))
     (push (car i) ip-list))
   (setq ip-list (reverse ip-list)))
-
+)
 (defun address2number (ip)
   (string-to-number (nth 3 (split-string ip "\\."))))
 
@@ -82,6 +82,6 @@
     (push (list ip hostname status services) hosts-list))
   hosts-list)
 
-;;; csv writer fehlt
-
-
+(defun write-to-csv-file (lst)
+  (while lst
+    (write-region (concatenate (mapconcat 'identity (pop lst) ",") "\n") nil output t)))
