@@ -6,8 +6,8 @@
   (prin1 "Enter path to Hosts CSV-file:")
   (setq	csvfile (read))
   (prin1 "Paths stored!"))
-(defvar csvfile "~/org/scripts/my-table-parser/taeble.csv")
-(defvar xmlfile "~/home.xml")
+(defvar csvfile "~/org/scripts/my-table-parser/table.csv")
+(defvar xmlfile "~/telekom2.xml")
 (defun map-xml-to-lisp ()
   (let* ((nmap-xml-object (with-temp-buffer
 			    (insert-file-contents xmlfile)
@@ -20,12 +20,12 @@
     (insert-file-contents "~/org/scripts/my-table-parser/table.csv")
     (split-string (buffer-string) "\n")))
 
-((defun content2-list-of-lines ()
+(defun content2-list-of-lines ()
   (setq list-of-lines ()
 	list-of-strings (get-csv-content))
   (while list-of-strings
     (push (split-string (pop list-of-strings) ",") list-of-lines))
-  (reverse list-of-lines))
+  list-of-lines)
 
 (defun search-hostname (ip)
   (setq search-list (content2-list-of-lines))
@@ -36,8 +36,8 @@
   (setq ip-list ())
   (dolist (i (content2-list-of-lines))
     (push (car i) ip-list))
-  (setq ip-list (reverse ip-list)))
-)
+  (setq ip-list (reverse (cdr (reverse ip-list)))))
+
 (defun address2number (ip)
   (string-to-number (nth 3 (split-string ip "\\."))))
 
@@ -80,8 +80,8 @@
 	  status (get-status ip)
 	  services (make-service-list ip))
     (push (list ip hostname status services) hosts-list))
-  hosts-list)
+  (reverse hosts-list))
 
 (defun write-to-csv-file (lst)
   (while lst
-    (write-region (concatenate (mapconcat 'identity (pop lst) ",") "\n") nil output t)))
+    (write-region (concatenate 'string (mapconcat 'identity (pop lst) ",") "\n") nil "service.csv" t)))
