@@ -8,12 +8,13 @@
   (prin1 "Paths stored!"))
 (defvar csvfile "~/org/scripts/my-table-parser/table.csv")
 (defvar xmlfile "~/telekom2.xml")
-(defun map-xml-to-lisp ()
-  (let* ((nmap-xml-object (with-temp-buffer
-			    (insert-file-contents xmlfile)
-			    (libxml-parse-xml-region (point-min) (point-max))))
-	 (host-nodes (dom-by-tag nmap-xml-object 'host)))
-    host-nodes))
+(setq nmap-xml-object (with-temp-buffer
+			(insert-file-contents xmlfile)
+			(libxml-parse-xml-region (point-min) (point-max))))
+
+(dom-attr (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'address) 'addr)
+(dom-attr (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'status) 'state)
+(dom-by-tag (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'ports) 'port)
 
 (defun get-csv-content ()
   (with-temp-buffer
