@@ -1,11 +1,4 @@
 ;;; NMAP XML Reader for Emacs
-
-(defun set-file-paths ()
-  (prin1 "Enter path to nmap xml:")
-  (setq xmlfile (read))
-  (prin1 "Enter path to Hosts CSV-file:")
-  (setq	csvfile (read))
-  (prin1 "Paths stored!"))
 (defvar csvfile "~/org/scripts/my-table-parser/table.csv")
 (defvar xmlfile "~/telekom2.xml")
 (setq nmap-xml-object (with-temp-buffer
@@ -14,7 +7,22 @@
 
 (dom-attr (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'address) 'addr)
 (dom-attr (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'status) 'state)
-(dom-by-tag (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'ports) 'port)
+(dom-attr (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'hostnames) 'name)
+(elt (dom-by-tag (dom-by-tag (elt (dom-by-tag nmap-xml-object 'host) 0) 'ports) 'port)0)
+
+(defparameter *hosts* (dom-by-tag nmap-xml-object 'host))
+(defparameter *hosts-list* ())
+(defun list-values (int)
+  (if (> 0 (- int 1))
+      'done
+    (let ((address (retrieve-value 'address 'addr))
+	  (status (retrieve-value 'status 'state))
+	  (hostname (retrieve-value 'hostname 'name)))
+      (push (list address status hostname) *hosts-list*)
+      (list-values (- int 1)))))
+
+(defun retrieve-value (key value)
+  `(dom-attr (dom-by-tag (elt (dom-by-tag *hosts* 'host) int) ',key) ',value))
 
 (defun get-csv-content ()
   (with-temp-buffer
